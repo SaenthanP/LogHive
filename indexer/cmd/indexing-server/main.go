@@ -1,9 +1,10 @@
 package main
 
 import (
-	"context"
 	"log"
 	"log/slog"
+	"main/internal/fetcher"
+	"main/internal/pipeline"
 	"os"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -24,10 +25,7 @@ func main() {
 		slog.Error("failed connect to eth node", "err", err)
 	}
 	slog.Debug("connected to eth node successfully")
-
-	block, err := ethNodeClient.BlockNumber(context.Background())
-	if err != nil {
-		slog.Error("error fetching current eth block number", "err", err)
-	}
-	slog.Info("succesfully retrieved latest block number", "block_number", block)
+	fetcherService := fetcher.NewFetcher(ethNodeClient)
+	pipelineService := pipeline.NewPipeline(fetcherService)
+	pipelineService.Run()
 }
