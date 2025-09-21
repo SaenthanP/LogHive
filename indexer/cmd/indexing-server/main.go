@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"context"
 	"log/slog"
 	"main/internal/fetcher"
 	"main/internal/pipeline"
@@ -16,16 +16,24 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		slog.Error("Error loading .env file")
+		panic("Error loading .env file")
 	}
 
 	ethNodeURL := os.Getenv("ETH_NODE_URL")
 	ethNodeClient, err := ethclient.Dial(ethNodeURL)
 	if err != nil {
 		slog.Error("failed connect to eth node", "err", err)
+		panic("failed to connect to eth node")
+
 	}
 	slog.Debug("connected to eth node successfully")
+
 	fetcherService := fetcher.NewFetcher(ethNodeClient)
 	pipelineService := pipeline.NewPipeline(fetcherService)
-	pipelineService.Run()
+	err = pipelineService.Run(context.Background())
+	if err != nil {
+		slog.Error("failed connect to run pipeline", "err", err)
+		panic("failed connect to run pipeline")
+	}
 }
