@@ -45,7 +45,7 @@ func (wp *WorkerPool[P, R]) Start(ctx context.Context, workerCount int) {
 	}
 }
 
-// TODO add graceful shit down, waitgroup check, etc.
+// TODO add graceful shut down, waitgroup check, etc.
 func (wp *WorkerPool[P, R]) worker(ctx context.Context, workerID int) {
 	for job := range wp.JobChan {
 		attempts := 0
